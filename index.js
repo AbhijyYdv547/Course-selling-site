@@ -6,13 +6,9 @@ const { adminRouter} = require("./routes/admin")
 const app = express();
 app.use(express.json());
 
-
-app.use("/user",userRouter);
-app.use("/course",courseRouter);
-app.use("/admin",adminRouter);
-
+app.use("api/v1/user",userRouter);
+app.use("api/v1/course",courseRouter);
+app.use("api/v1/admin",adminRouter);
 
 
-app.listen(3000,()=>{
-    console.log('Server is running on port 3000');
-})
+app.listen(3000)

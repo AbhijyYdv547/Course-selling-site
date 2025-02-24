@@ -1,14 +1,16 @@
-const express = require('express');
-const Router = express.Router();
-
+const {Router}  = require('express')
 const courseRouter = Router();
 
-courseRouter.post('/', (req, res) => {
-    res.send('Hello, World!');
+courseRouter.get('/preview', (req, res) => {
+    res.json({
+        message:"signup endpoint"
+    })
 })
 
-courseRouter.post('/purchases', (req, res) => {
-    res.send('Hello, World!');
+courseRouter.post('/purchase', (req, res) => {
+    res.json({
+        message:"signup endpoint"
+    })
 })
 
 module.exports = {
