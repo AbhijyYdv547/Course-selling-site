@@ -4,19 +4,37 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.ObjectId;
 
 
-const Course = new Schema({
+const courseSchema = new Schema({
+    title: String,
     description: String,
-    isDone: Boolean,
+    price: Number,
+    imageUrl: String,
+    creatorId: ObjectId
+})
+
+const userSchema = new Schema({
+    email: { type: String, unique: true },
+    password: String,
+    firstName: String,
+    lastName: String
+})
+
+const adminSchema = new Schema({
+    email: { type: String, unique: true },
+    password: String,
+    firstName: String,
+    lastName: String
+})
+
+const purchaseSchema = new Schema({
+    courseId: ObjectId,
     userId: ObjectId
 })
 
-const User = new Schema({
-    email: {type:String, unique:true},
-    password: String,
-    name: String
-})
+const courseModel = mongoose.model('courses', courseSchema);
+const userModel = mongoose.model('users', userSchema);
+const adminModel = mongoose.model('admins', adminSchema);
+const purchaseModel = mongoose.model('purchases', purchaseSchema);
 
-const TodoModel = mongoose.model('courses', Course);
-const UserModel = mongoose.model('users', User);
 
-module.exports = { UserModel,TodoModel };
+module.exports = { userModel, courseModel, adminModel, purchaseModel };
