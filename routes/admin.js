@@ -1,43 +1,85 @@
-const {Router}  = require('express')
-const { adminModel } = require('../db');
+const { Router } = require("express");
+const { adminModel, courseModel } = require("../db");
 const adminRouter = Router();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const dotenv = require("dotenv");
+const {adminMiddleware} = require("../middlewares/adminMiddleware")
+dotenv.config();
+const JWT_ADMIN_PASSWORD = process.env.JWT_ADMIN_PASSWORD;
 
-adminRouter.post('/signin', async (req, res) => {
-    const {email,password,firstName,lastName} = req.body;
-    await adminModel.create({
-        email,
-        password,
-        firstName,
-        lastName
-    });
-})
-
-adminRouter.post('/signup', async (req, res) => {
-    const {email,password} = req.body;
-    let admin = await adminModel.findOne({
-        email: email,
-        password: password
-    })
-    if(admin){
-        res.status(200).json({message: 'Login Successful', user})
-    }else{
-        res.status(401).json({message: 'Invalid credentials'})
+adminRouter.post("/signup", async (req, res) => {
+    const { email, password, firstName, lastName } = req.body;
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        await adminModel.create({
+            email,
+            password: hashedPassword,
+            firstName,
+            lastName,
+        });
+        res.status(201).json({ message: "User created successfully" });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: e.message || "Internal Server Error" });
     }
- 
-})
+});
 
-adminRouter.post('/course', (req, res) => {
-    res.send('Hello, World!');
-})
 
-adminRouter.put('/course', (req, res) => {
-    res.send('Hello, World!');
-})
+adminRouter.post("/signin", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const admin = await adminModel.findOne({ email });
 
-adminRouter.get('/course/bulk', (req, res) => {
-    res.send('Hello, World!');
-})
+        if (!admin) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
-module.exports = {
-    adminRouter: adminRouter
-}
+        const passMatch = await bcrypt.compare(password, admin.password);
+        if (!passMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign({ id: admin._id }, JWT_ADMIN_PASSWORD, {
+            expiresIn: "1h",
+        });
+
+        return res.status(200).json({
+            message: "Login Successful",
+            token,
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+adminRouter.post("/course",adminMiddleware,async (req, res) => {
+    const adminId = req.userId;
+    const {title, description, imageUrl, price} = req.body;
+    const course = await courseModel.create({
+        title,
+        description,
+        imageUrl,
+        price,
+        creatorId: adminId
+    })
+    res.json({
+        message: "Course created successfully",
+        courseId:course._id
+    })
+});
+
+adminRouter.put("/course", (req, res) => {
+    res.send("Hello, World!");
+});
+
+adminRouter.get("/course/bulk", (req, res) => {
+    res.send("Hello, World!");
+});
+
+
+module.exports = { adminRouter };
