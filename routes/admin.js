@@ -86,7 +86,7 @@ adminRouter.put("/course",adminMiddleware,async (req, res) => {
     })
     res.json({
         message: "Course updated successfully",
-        courseId:course._id
+        courseId:course._id 
     })
 });
 
