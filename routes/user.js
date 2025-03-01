@@ -4,8 +4,7 @@ const {userMiddleware} = require("../middlewares/userMiddleware")
 const bcrypt = require('bcrypt');
 const userRouter = Router();
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-dotenv.config();
+require("dotenv").config();
 
 
 userRouter.post('/signup',async (req, res) => {
