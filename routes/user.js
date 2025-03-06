@@ -60,8 +60,12 @@ userRouter.post('/purchases',userMiddleware,async (req, res) => {
     const purchases = await purchaseModel.find({
         userId
     })
+    const coursesData = await coursesModel.find({
+        _id: {$in: purchases.map(p => p.courseId)}
+    })
     res.json({
-        purchases
+        purchases,
+        coursesData
     })
 })
 
