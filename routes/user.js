@@ -54,8 +54,15 @@ userRouter.post("/signin", async (req, res) => {
 });
 
 
-userRouter.post('/purchases',userMiddleware, (req, res) => {
-    res.send('Hello, World!');
+userRouter.post('/purchases',userMiddleware,async (req, res) => {
+    const userId = req.userId;
+    const courseId = req.body.courseId;
+    const purchases = await purchaseModel.find({
+        userId
+    })
+    res.json({
+        purchases
+    })
 })
 
 module.exports = {
